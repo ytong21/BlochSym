@@ -15,3 +15,11 @@ rfFull = [zeros(nG-nRF,1); rf];
 mxss1_mt = reshape(mxss1_mt,size(X));
 myss1_mt = reshape(myss1_mt,size(X));
 mzss1_mt = reshape(mzss1_mt,size(X));
+mxyss1_mt = abs(mxss1_mt+1i*myss1_mt);
+
+
+figure
+slice = round(size(mxyss1_mt,3)/2);
+imagesc(mxyss1_mt(:,:,slice))
+title Excitation Pattern
+axis image;colorbar
