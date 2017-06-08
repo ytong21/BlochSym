@@ -1,9 +1,5 @@
-function [mxss1_mt,myss1_mt,mzss1_mt] = make_blochSim(rf,b1,g,dt,Positions)
-posVecX = squeeze(Positions(1,:,1,1));
-posVecY = squeeze(Positions(2,1,:,1));
-posVecZ = squeeze(Positions(3,1,1,:));
-[X,Y,Z] = meshgrid(posVecX,posVecY,posVecZ);
-dp = [X(:) Y(:) Z(:)];
+function magnetization = make_blochSim(rf,b1,g,dt,dp,mask)
+
 df = zeros(size(dp,1),1);
 mode = 0;
 sens = b1(:);
@@ -12,14 +8,18 @@ nG = size(g,1);
 rfFull = [zeros(nG-nRF,1); rf];
 [mxss1_mt,myss1_mt,mzss1_mt] =  blochSim_mex_multiThread(rfFull,sens,g,dt,df,dp,mode);
 
-mxss1_mt = reshape(mxss1_mt,size(X));
-myss1_mt = reshape(myss1_mt,size(X));
-mzss1_mt = reshape(mzss1_mt,size(X));
-mxyss1_mt = abs(mxss1_mt+1i*myss1_mt);
+mx = zeros(size(mask));
+my = zeros(size(mask));
+mz = zeros(size(mask));
+mx(~mask==0) = mxss1_mt;
+my(~mask==0) = myss1_mt;
+mz(~mask==0) = mzss1_mt;
+mxy = abs(mx+1i*my);
 
+magnetization = struct('mx',mx,'my',my,'mz',mz,'mxy',mxy);
 
 figure
-slice = round(size(mxyss1_mt,3)/2);
-imagesc(mxyss1_mt(:,:,slice))
+slice = round(size(mxy,3)/2);
+imagesc(mxy(:,:,slice))
 title Excitation Pattern
 axis image;colorbar
