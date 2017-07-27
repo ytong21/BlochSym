@@ -1,10 +1,11 @@
-function magnetization = make_blochSim(rf,b1,g,dt,dp,mask)
+function magnetization = make_blochSim(rf,b1,b0,g,dt,dp,mask)
 
-df = zeros(size(dp,1),1);
 mode = 0;
-sens = b1(:);
+sens = complex(b1);
+df = b0;
 nRF = size(rf,1);
 nG = size(g,1);
+g(:,3) = zeros;
 rfFull = [zeros(nG-nRF,1); rf];
 [mxss1_mt,myss1_mt,mzss1_mt] =  blochSim_mex_multiThread(rfFull,sens,g,dt,df,dp,mode);
 
@@ -18,8 +19,7 @@ mxy = abs(mx+1i*my);
 
 magnetization = struct('mx',mx,'my',my,'mz',mz,'mxy',mxy);
 
-figure
-slice = round(size(mxy,3)/2);
-imagesc(mxy(:,:,slice))
-title Excitation Pattern
-axis image;colorbar
+% figure
+% imagesc(mxy)
+% title 'Excitation Pattern'
+% axis image;colorbar
